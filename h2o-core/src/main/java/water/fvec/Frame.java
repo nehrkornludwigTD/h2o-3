@@ -1431,17 +1431,37 @@ public class Frame extends Lockable<Frame> {
     return new CSVStream(this, headers, hex_string);
   }
 
+  /** Convert this Frame to a CSV (in an {@link InputStream}), that optionally
+   *  is compatible with R 3.1's recent change to read.csv()'s behavior.
+   *
+   *  WARNING: Note that the end of a file is denoted by the read function
+   *  returning 0 instead of -1.
+   *
+   *  @return An InputStream containing this Frame as a CSV */
+  public InputStream toCSV(boolean headers, boolean hex_string, boolean stripNAs) {
+    return new CSVStream(this, headers, hex_string, stripNAs);
+  }
+
   public static class CSVStream extends InputStream {
+
+    private static final String N_A = "NA";
+
     private final boolean _hex_string;
     byte[] _line;
     int _position;
     int _chkRow;
     Chunk[] _curChks;
     int _lastChkIdx;
+    boolean __strip_nas = true;
     public volatile int _curChkIdx; // used only for progress reporting
 
     public CSVStream(Frame fr, boolean headers, boolean hex_string) {
       this(firstChunks(fr), headers ? fr.names() : null, fr.anyVec().nChunks(), hex_string);
+    }
+
+    public CSVStream(Frame fr, boolean headers, boolean hex_string, boolean stripNAs) {
+      this(firstChunks(fr), headers ? fr.names() : null, fr.anyVec().nChunks(), hex_string);
+      __strip_nas = stripNAs;
     }
 
     private static Chunk[] firstChunks(Frame fr) {
@@ -1502,6 +1522,10 @@ public class Frame extends Lockable<Frame> {
             //   http://stackoverflow.com/questions/23072988/preserve-old-pre-3-1-0-type-convert-behavior
             String s = _hex_string ? Double.toHexString(d) : Double.toString(d);
             sb.append(s);
+          }
+        } else {
+          if (!__strip_nas) {
+            sb.append(N_A);
           }
         }
       }

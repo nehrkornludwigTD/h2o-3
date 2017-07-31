@@ -1221,7 +1221,7 @@ class H2OFrame(object):
                 print("num {}".format(" ".join(it[0] if it else "nan" for it in h2o.as_list(self[:10, i], False)[1:])))
 
 
-    def as_data_frame(self, use_pandas=True, header=True):
+    def as_data_frame(self, use_pandas=True, header=True, strip_nas=True):
         """
         Obtain the dataset as a python-local object.
 
@@ -1229,27 +1229,28 @@ class H2OFrame(object):
             ``pandas`` library was installed). If False, then return the contents of the H2OFrame as plain nested
             list, in a row-wise order.
         :param bool header: If True (default), then column names will be appended as the first row in list
+        :param strip_nas: If True (default), then the NaNs are removed from pandas DataFrame (in case of list of lists of strings, empty lists contain 'NaN').
 
         :returns: A python object (a list of lists of strings, each list is a row, if use_pandas=False, otherwise
             a pandas DataFrame) containing this H2OFrame instance's data.
         """
         if can_use_pandas() and use_pandas:
             import pandas
-            return pandas.read_csv(StringIO(self.get_frame_data()), low_memory=False)
-        frame = [row for row in csv.reader(StringIO(self.get_frame_data()))]
+            return pandas.read_csv(StringIO(self.get_frame_data(strip_nas)), low_memory=False)
+        frame = [row for row in csv.reader(StringIO(self.get_frame_data(strip_nas)))]
         if not header:
             frame.pop(0)
         return frame
 
 
-    def get_frame_data(self):
+    def get_frame_data(self, strip_nas=True):
         """
         Get frame data as a string in csv format.
 
         This will create a multiline string, where each line will contain a separate row of frame's data, with
         individual values separated by commas.
         """
-        return h2o.api("GET /3/DownloadDataset", data={"frame_id": self.frame_id, "hex_string": False})
+        return h2o.api("GET /3/DownloadDataset", data={"frame_id": self.frame_id, "hex_string": False, 'strip_nas': strip_nas})
 
 
     def __getitem__(self, item):
