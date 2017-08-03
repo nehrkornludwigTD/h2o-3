@@ -1229,11 +1229,15 @@ class H2OFrame(object):
             ``pandas`` library was installed). If False, then return the contents of the H2OFrame as plain nested
             list, in a row-wise order.
         :param bool header: If True (default), then column names will be appended as the first row in list
-        :param strip_nas: If True (default), then the NaNs are removed from pandas DataFrame (in case of list of lists of strings, empty lists contain 'NaN').
+        :param bool strip_nas: If True (default), then the NaNs are removed from pandas DataFrame (in case of list of lists of strings, empty lists contain 'NaN').
 
         :returns: A python object (a list of lists of strings, each list is a row, if use_pandas=False, otherwise
             a pandas DataFrame) containing this H2OFrame instance's data.
         """
+        assert_is_type(use_pandas, bool)
+        assert_is_type(header, bool)
+        assert_is_type(strip_nas, bool)
+
         if can_use_pandas() and use_pandas:
             import pandas
             return pandas.read_csv(StringIO(self.get_frame_data(strip_nas)), low_memory=False)
@@ -1249,7 +1253,11 @@ class H2OFrame(object):
 
         This will create a multiline string, where each line will contain a separate row of frame's data, with
         individual values separated by commas.
+
+        :param bool strip_nas: If True (default), then the NaNs are removed from pandas DataFrame (in case of list of lists of strings, empty lists contain 'NaN').
         """
+        assert_is_type(strip_nas, bool)
+
         return h2o.api("GET /3/DownloadDataset", data={"frame_id": self.frame_id, "hex_string": False, 'strip_nas': strip_nas})
 
 
