@@ -1452,7 +1452,7 @@ public class Frame extends Lockable<Frame> {
     int _chkRow;
     Chunk[] _curChks;
     int _lastChkIdx;
-    boolean __strip_nas = true;
+    boolean _strip_nas = true;
     public volatile int _curChkIdx; // used only for progress reporting
 
     public CSVStream(Frame fr, boolean headers, boolean hex_string) {
@@ -1461,7 +1461,7 @@ public class Frame extends Lockable<Frame> {
 
     public CSVStream(Frame fr, boolean headers, boolean hex_string, boolean stripNAs) {
       this(firstChunks(fr), headers ? fr.names() : null, fr.anyVec().nChunks(), hex_string);
-      __strip_nas = stripNAs;
+      _strip_nas = stripNAs;
     }
 
     private static Chunk[] firstChunks(Frame fr) {
@@ -1524,7 +1524,7 @@ public class Frame extends Lockable<Frame> {
             sb.append(s);
           }
         } else {
-          if (!__strip_nas) {
+          if (!_strip_nas) {
             sb.append(N_A);
           }
         }
