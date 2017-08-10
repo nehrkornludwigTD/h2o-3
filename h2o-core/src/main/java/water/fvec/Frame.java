@@ -1438,8 +1438,8 @@ public class Frame extends Lockable<Frame> {
    *  returning 0 instead of -1.
    *
    *  @return An InputStream containing this Frame as a CSV */
-  public InputStream toCSV(boolean headers, boolean hex_string, boolean stripNAs) {
-    return new CSVStream(this, headers, hex_string, stripNAs);
+  public InputStream toCSV(boolean headers, boolean hex_string, String na_value) {
+    return new CSVStream(this, headers, hex_string, na_value);
   }
 
   public static class CSVStream extends InputStream {
@@ -1452,16 +1452,16 @@ public class Frame extends Lockable<Frame> {
     int _chkRow;
     Chunk[] _curChks;
     int _lastChkIdx;
-    boolean _strip_nas = true;
+    String _na_value = "";
     public volatile int _curChkIdx; // used only for progress reporting
 
     public CSVStream(Frame fr, boolean headers, boolean hex_string) {
       this(firstChunks(fr), headers ? fr.names() : null, fr.anyVec().nChunks(), hex_string);
     }
 
-    public CSVStream(Frame fr, boolean headers, boolean hex_string, boolean stripNAs) {
+    public CSVStream(Frame fr, boolean headers, boolean hex_string, String na_value) {
       this(firstChunks(fr), headers ? fr.names() : null, fr.anyVec().nChunks(), hex_string);
-      _strip_nas = stripNAs;
+      _na_value = na_value;
     }
 
     private static Chunk[] firstChunks(Frame fr) {
@@ -1524,9 +1524,7 @@ public class Frame extends Lockable<Frame> {
             sb.append(s);
           }
         } else {
-          if (!_strip_nas) {
-            sb.append(N_A);
-          }
+          sb.append(_na_value);
         }
       }
       sb.append('\n');

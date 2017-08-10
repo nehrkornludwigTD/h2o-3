@@ -14,7 +14,7 @@ import java.io.OutputStream;
  */
 public class DatasetServlet extends HttpServlet {
 
-  public static final String STRIP_NAS_REQUEST_PARAM_NAME = "strip_nas";
+  public static final String NA_VALUE_PARAM_NAME = "na_value";
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -24,9 +24,9 @@ public class DatasetServlet extends HttpServlet {
       String f_name = request.getParameter("frame_id");
       String hex_string = request.getParameter("hex_string");
 
-      boolean strip_nas = true;
-      if (request.getParameter(STRIP_NAS_REQUEST_PARAM_NAME) != null) {
-        strip_nas = Boolean.parseBoolean(request.getParameter("strip_nas"));
+      String na_value = "";
+      if (request.getParameter(NA_VALUE_PARAM_NAME) != null) {
+        na_value = request.getParameter(NA_VALUE_PARAM_NAME);
       }
 
       if (f_name == null) {
@@ -38,7 +38,7 @@ public class DatasetServlet extends HttpServlet {
 
       Frame dataset = DKV.getGet(f_name);
       // TODO: Find a way to determing the hex_string parameter. It should not always be false
-      InputStream is = dataset.toCSV(true, use_hex, strip_nas);
+      InputStream is = dataset.toCSV(true, use_hex, na_value);
       response.setContentType("application/octet-stream");
       // Clean up the file name
       int x = f_name.length() - 1;
