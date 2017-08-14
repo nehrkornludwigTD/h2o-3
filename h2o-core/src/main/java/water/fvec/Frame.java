@@ -1444,8 +1444,6 @@ public class Frame extends Lockable<Frame> {
 
   public static class CSVStream extends InputStream {
 
-    private static final String N_A = "NA";
-
     private final boolean _hex_string;
     byte[] _line;
     int _position;

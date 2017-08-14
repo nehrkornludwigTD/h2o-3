@@ -1229,19 +1229,17 @@ class H2OFrame(object):
             ``pandas`` library was installed). If False, then return the contents of the H2OFrame as plain nested
             list, in a row-wise order.
         :param bool header: If True (default), then column names will be appended as the first row in list
-        :param bool na_value: value used to represent NA).
 
         :returns: A python object (a list of lists of strings, each list is a row, if use_pandas=False, otherwise
             a pandas DataFrame) containing this H2OFrame instance's data.
         """
         assert_is_type(use_pandas, bool)
         assert_is_type(header, bool)
-        assert_is_type(na_value, str)
 
         if can_use_pandas() and use_pandas:
             import pandas
-            return pandas.read_csv(StringIO(self.get_frame_data(na_value)), low_memory=False)
-        frame = [row for row in csv.reader(StringIO(self.get_frame_data(na_value)))]
+            return pandas.read_csv(StringIO(self.get_frame_data()), low_memory=False)
+        frame = [row for row in csv.reader(StringIO(self.get_frame_data()))]
         if not header:
             frame.pop(0)
         return frame
@@ -1254,11 +1252,9 @@ class H2OFrame(object):
         This will create a multiline string, where each line will contain a separate row of frame's data, with
         individual values separated by commas.
 
-        :param bool na_value: value used to represent NA.
         """
-        assert_is_type(na_value, str)
 
-        return h2o.api("GET /3/DownloadDataset", data={"frame_id": self.frame_id, "hex_string": False, 'na_value': na_value})
+        return h2o.api("GET /3/DownloadDataset", data={"frame_id": self.frame_id, "hex_string": False, 'na_value': 'NA'})
 
 
     def __getitem__(self, item):
