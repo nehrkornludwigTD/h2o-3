@@ -1,0 +1,4 @@
+#! /bin/bash
+
+sudo -u hdfs hadoop fs -mkdir -p /user/h2o
+sudo -u hdfs hadoop fs -chown h2o:h2o /user/h2o
