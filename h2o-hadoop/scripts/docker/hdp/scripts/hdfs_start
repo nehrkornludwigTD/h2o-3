@@ -1,0 +1,6 @@
+#! /bin/bash
+
+HADOOP_DAEMON=/usr/hdp/2*/hadoop/sbin/hadoop-daemon.sh
+${HADOOP_DAEMON} start namenode
+${HADOOP_DAEMON} start secondarynamenode
+${HADOOP_DAEMON} start datanode

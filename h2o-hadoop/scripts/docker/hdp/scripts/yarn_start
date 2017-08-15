@@ -1,0 +1,6 @@
+#! /bin/bash
+
+YARN_DAEMON=/usr/hdp/2*/hadoop-yarn/sbin/yarn-daemon.sh
+${YARN_DAEMON} start resourcemanager
+${YARN_DAEMON} start nodemanager
+${YARN_DAEMON} start timelineserver
