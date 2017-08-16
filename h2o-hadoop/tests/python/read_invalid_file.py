@@ -6,7 +6,7 @@ from pandas.util.testing import assert_frame_equal
 
 
 def read_invalid_file():
-  h2o.init()
+  h2o.connect()
   try:
       hdfs_path = 'hdfs:///user/h2o/tests/invalid'
       hdfs_frame = h2o.import_file(hdfs_path)

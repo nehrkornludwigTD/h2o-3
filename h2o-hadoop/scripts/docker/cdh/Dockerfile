@@ -14,15 +14,12 @@ RUN wget http://archive.cloudera.com/cdh5/ubuntu/trusty/amd64/cdh/archive.key -O
 
 RUN apt-get install -y hadoop-conf-pseudo python-dev python-pip python-scipy
 RUN pip install requests --upgrade
-RUN pip install pandas
+RUN pip install colorama future tabulate pandas
 
 RUN service hadoop-hdfs-namenode init
 
 # Add H2O user
 RUN useradd -ms /bin/bash h2o
-RUN sudo -u h2o mkdir /home/h2o/tests
-RUN sudo -u h2o mkdir /home/h2o/tests/R
-RUN sudo -u h2o mkdir /home/h2o/tests/python
 
 COPY "scripts/hdfs_start" "/etc/startup/00_hdfs_start"
 RUN chmod 700 "/etc/startup/00_hdfs_start"

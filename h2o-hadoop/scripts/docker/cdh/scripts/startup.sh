@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e
+
 NC='\033[0m'
 RED='\033[91m'
 
@@ -33,7 +35,9 @@ if [[ $(echo ${RUN_TESTS} | tr -s '[:upper:]' '[:lower:]') == 'true' ]]; then
     total=$(($total + 1))
     echo
     echo "####### Running test file ${x} #######"
+    unset e
     python ${x}
+    set -e
     if [ $? -ne 0 ]; then
       failed=$(($failed + 1))
       echo "###### FAILED ######"
