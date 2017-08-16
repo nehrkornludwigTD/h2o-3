@@ -12,28 +12,44 @@ COPY conf/cloudera.pref /etc/apt/preferences.d/cloudera.pref
 RUN wget http://archive.cloudera.com/cdh5/ubuntu/trusty/amd64/cdh/archive.key -O archive.key && sudo apt-key add archive.key && \
     sudo apt-get update
 
-RUN apt-get install -y hadoop-conf-pseudo
+RUN apt-get install -y hadoop-conf-pseudo python-dev python-pip python-scipy
+RUN pip install requests --upgrade
+RUN pip install pandas
 
 RUN service hadoop-hdfs-namenode init
 
 # Add H2O user
 RUN useradd -ms /bin/bash h2o
+RUN sudo -u h2o mkdir /home/h2o/tests
+RUN sudo -u h2o mkdir /home/h2o/tests/R
+RUN sudo -u h2o mkdir /home/h2o/tests/python
 
-COPY "scripts/startup.sh" "/usr/bin/startup.sh"
-RUN chmod +x /usr/bin/startup.sh
+COPY "scripts/hdfs_start" "/etc/startup/00_hdfs_start"
+RUN chmod 700 "/etc/startup/00_hdfs_start"
 
-COPY "scripts/hdfs_start" "/usr/sbin/hdfs_start"
-RUN chmod 700 "/usr/sbin/hdfs_start"
-COPY "scripts/hdfs_setup" "/usr/sbin/hdfs_setup"
-RUN chmod 700 "/usr/sbin/hdfs_setup"
-COPY "scripts/hdfs_create_h2o_home" "/usr/sbin/hdfs_create_h2o_home"
-RUN chmod 700 "/usr/sbin/hdfs_create_h2o_home"
-COPY "scripts/yarn_start" "/usr/sbin/yarn_start"
-RUN chmod 700 "/usr/sbin/yarn_start"
+COPY "scripts/hdfs_setup" "/etc/startup/10_hdfs_setup"
+RUN chmod 700 "/etc/startup/10_hdfs_setup"
+
+COPY "scripts/hdfs_create_h2o_home" "/etc/startup/20_hdfs_create_h2o_home"
+RUN chmod 700 "/etc/startup/20_hdfs_create_h2o_home"
+
+COPY "scripts/yarn_start" "/etc/startup/30_yarn_start"
+RUN chmod 700 "/etc/startup/30_yarn_start"
+
+COPY "scripts/init_h2o" "/etc/startup/40_init_h2o"
+RUN chmod 700 "/etc/startup/40_init_h2o"
 
 # H2O
 EXPOSE 54321
 # HADOOP UI
 EXPOSE 8088
+
+ENV VERSION $VERSION
+ENV INIT_H2O TRUE
+ENV RUN_TESTS TRUE
+ENV ENTER_BASH FALSE
+
+COPY "scripts/startup.sh" "/usr/bin/startup.sh"
+RUN chmod +x /usr/bin/startup.sh
 
 CMD "/usr/bin/startup.sh"
